@@ -1,0 +1,290 @@
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+
+const questions = [
+  // Extraversion (E)
+  { id: 1, text: "Am the life of the party", factor: "E", reversed: false },
+  { id: 2, text: "Don't talk a lot", factor: "E", reversed: true },
+  { id: 3, text: "Feel comfortable around people", factor: "E", reversed: false },
+  { id: 4, text: "Keep in the background", factor: "E", reversed: true },
+  { id: 5, text: "Start conversations", factor: "E", reversed: false },
+  { id: 6, text: "Have little to say", factor: "E", reversed: true },
+  { id: 7, text: "Talk to a lot of different people at parties", factor: "E", reversed: false },
+  { id: 8, text: "Don't like to draw attention to myself", factor: "E", reversed: true },
+  { id: 9, text: "Don't mind being the center of attention", factor: "E", reversed: false },
+  { id: 10, text: "Am quiet around strangers", factor: "E", reversed: true },
+  
+  // Agreeableness (A)
+  { id: 11, text: "Feel little concern for others", factor: "A", reversed: true },
+  { id: 12, text: "Am interested in people", factor: "A", reversed: false },
+  { id: 13, text: "Insult people", factor: "A", reversed: true },
+  { id: 14, text: "Sympathize with others' feelings", factor: "A", reversed: false },
+  { id: 15, text: "Am not interested in other people's problems", factor: "A", reversed: true },
+  { id: 16, text: "Have a soft heart", factor: "A", reversed: false },
+  { id: 17, text: "Am not really interested in others", factor: "A", reversed: true },
+  { id: 18, text: "Take time out for others", factor: "A", reversed: false },
+  { id: 19, text: "Feel others' emotions", factor: "A", reversed: false },
+  { id: 20, text: "Make people feel at ease", factor: "A", reversed: false },
+  
+  // Conscientiousness (C)
+  { id: 21, text: "Am always prepared", factor: "C", reversed: false },
+  { id: 22, text: "Leave my belongings around", factor: "C", reversed: true },
+  { id: 23, text: "Pay attention to details", factor: "C", reversed: false },
+  { id: 24, text: "Make a mess of things", factor: "C", reversed: true },
+  { id: 25, text: "Get chores done right away", factor: "C", reversed: false },
+  { id: 26, text: "Often forget to put things back in their proper place", factor: "C", reversed: true },
+  { id: 27, text: "Like order", factor: "C", reversed: false },
+  { id: 28, text: "Shirk my duties", factor: "C", reversed: true },
+  { id: 29, text: "Follow a schedule", factor: "C", reversed: false },
+  { id: 30, text: "Am exacting in my work", factor: "C", reversed: false },
+  
+  // Neuroticism (N)
+  { id: 31, text: "Get stressed out easily", factor: "N", reversed: false },
+  { id: 32, text: "Am relaxed most of the time", factor: "N", reversed: true },
+  { id: 33, text: "Worry about things", factor: "N", reversed: false },
+  { id: 34, text: "Seldom feel blue", factor: "N", reversed: true },
+  { id: 35, text: "Am easily disturbed", factor: "N", reversed: false },
+  { id: 36, text: "Get upset easily", factor: "N", reversed: false },
+  { id: 37, text: "Change my mood a lot", factor: "N", reversed: false },
+  { id: 38, text: "Have frequent mood swings", factor: "N", reversed: false },
+  { id: 39, text: "Get irritated easily", factor: "N", reversed: false },
+  { id: 40, text: "Often feel blue", factor: "N", reversed: false },
+  
+  // Openness (O)
+  { id: 41, text: "Have a rich vocabulary", factor: "O", reversed: false },
+  { id: 42, text: "Have difficulty understanding abstract ideas", factor: "O", reversed: true },
+  { id: 43, text: "Have a vivid imagination", factor: "O", reversed: false },
+  { id: 44, text: "Am not interested in abstract ideas", factor: "O", reversed: true },
+  { id: 45, text: "Have excellent ideas", factor: "O", reversed: false },
+  { id: 46, text: "Do not have a good imagination", factor: "O", reversed: true },
+  { id: 47, text: "Am quick to understand things", factor: "O", reversed: false },
+  { id: 48, text: "Use difficult words", factor: "O", reversed: false },
+  { id: 49, text: "Spend time reflecting on things", factor: "O", reversed: false },
+  { id: 50, text: "Am full of ideas", factor: "O", reversed: false },
+];
+
+const careerSuggestions = {
+  E: {
+    high: ["Sales Representative", "Teacher", "Event Planner", "Public Relations", "Manager"],
+    low: ["Research Analyst", "Writer", "Accountant", "Software Developer", "Artist"]
+  },
+  A: {
+    high: ["Counselor", "Nurse", "Social Worker", "HR Manager", "Teacher"],
+    low: ["Lawyer", "Entrepreneur", "Military Officer", "Critic", "Financial Trader"]
+  },
+  C: {
+    high: ["Project Manager", "Accountant", "Engineer", "Doctor", "Executive"],
+    low: ["Artist", "Freelancer", "Entrepreneur", "Creative Director", "Journalist"]
+  },
+  N: {
+    high: ["Artist", "Writer", "Therapist", "Academic", "Designer"],
+    low: ["Emergency Responder", "Air Traffic Controller", "Sales Manager", "Military Officer", "Surgeon"]
+  },
+  O: {
+    high: ["Artist", "Researcher", "Professor", "Writer", "Entrepreneur"],
+    low: ["Data Entry Clerk", "Security Guard", "Production Worker", "Accountant", "Administrative Assistant"]
+  }
+};
+
+const relationshipAdvice = {
+  E: {
+    high: "You thrive in relationships with people who can match your energy and social nature. Look for partners who enjoy social activities and can engage in stimulating conversations. You may need a partner who understands your need for social interaction.",
+    low: "You prefer intimate, one-on-one relationships and value deep connections. Look for partners who respect your need for alone time and don't pressure you into excessive socializing."
+  },
+  A: {
+    high: "Your empathetic nature makes you a caring partner. You'll do well with someone equally compassionate who appreciates your kindness. Be careful not to lose yourself in relationships by always putting others first.",
+    low: "You're direct and value independence in relationships. Look for partners who appreciate honesty and can handle direct communication. Avoid overly sensitive individuals who might misinterpret your straightforward approach."
+  },
+  C: {
+    high: "You value organization and reliability in relationships. You'll work well with partners who share your appreciation for structure and planning. Look for someone who respects commitments and follows through on plans.",
+    low: "You bring spontaneity to relationships and prefer flexibility. Look for partners who can help provide some structure while appreciating your free-spirited nature."
+  },
+  N: {
+    high: "You experience emotions deeply and need a patient, understanding partner. Look for someone who can provide emotional stability and support during stressful times.",
+    low: "Your emotional stability makes you a steady partner. You'll work well with both calm and emotional partners, as you can provide balance and perspective."
+  },
+  O: {
+    high: "You need intellectual stimulation in relationships. Look for partners who share your curiosity about life and enjoy exploring new ideas and experiences together.",
+    low: "You value tradition and stability in relationships. Look for partners who share your practical approach to life and appreciate routine and familiarity."
+  }
+};
+
+const PersonalityTest = () => {
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [results, setResults] = useState(null);
+  const [showResults, setShowResults] = useState(false);
+
+  const handleAnswer = (value) => {
+    const question = questions[currentQuestionIndex];
+    const adjustedValue = question.reversed ? 6 - value : value;
+    
+    setAnswers(prev => ({
+      ...prev,
+      [question.id]: adjustedValue
+    }));
+
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    } else {
+      calculateResults();
+    }
+  };
+
+  const calculateResults = () => {
+    const scores = {
+      E: 0, A: 0, C: 0, N: 0, O: 0
+    };
+    
+    questions.forEach(question => {
+      const answer = answers[question.id];
+      if (answer) {
+        scores[question.factor] += answer;
+      }
+    });
+
+    // Convert raw scores to percentages
+    const maxScorePerFactor = 50; // 10 questions * 5 points max
+    const results = {
+      E: (scores.E / maxScorePerFactor) * 100,
+      A: (scores.A / maxScorePerFactor) * 100,
+      N: (scores.N / maxScorePerFactor) * 100,
+      C: (scores.C / maxScorePerFactor) * 100,
+      O: (scores.O / maxScorePerFactor) * 100
+    };
+
+    setResults(results);
+    setShowResults(true);
+  };
+
+  const getFactorName = (factor) => {
+    const names = {
+      E: "Extraversion",
+      A: "Agreeableness",
+      C: "Conscientiousness",
+      N: "Neuroticism",
+      O: "Openness"
+    };
+    return names[factor];
+  };
+
+  const getLevel = (score) => score >= 50 ? "high" : "low";
+
+  if (showResults) {
+    return (
+      <div className="max-w-4xl mx-auto p-4 space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Big Five Personality Profile</CardTitle>
+            <CardDescription>
+              Here's your personality breakdown based on the Big Five model
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {Object.entries(results).map(([factor, score]) => (
+              <div key={factor} className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">{getFactorName(factor)}</span>
+                  <span className="text-sm">{Math.round(score)}%</span>
+                </div>
+                <Progress value={score} className="w-full" />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Career Suggestions</CardTitle>
+            <CardDescription>Based on your personality profile, these careers might be a good fit:</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {Object.entries(results).map(([factor, score]) => (
+                <div key={factor} className="space-y-2">
+                  <h3 className="font-medium">{getFactorName(factor)}:</h3>
+                  <ul className="list-disc ml-6">
+                    {careerSuggestions[factor][getLevel(score)].map((career, index) => (
+                      <li key={index}>{career}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Relationship Insights</CardTitle>
+            <CardDescription>Understanding your personality can help in building better relationships</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {Object.entries(results).map(([factor, score]) => (
+                <div key={factor} className="space-y-2">
+                  <h3 className="font-medium">{getFactorName(factor)}:</h3>
+                  <p className="text-sm">{relationshipAdvice[factor][getLevel(score)]}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Button 
+          onClick={() => {
+            setShowResults(false);
+            setCurrentQuestionIndex(0);
+            setAnswers({});
+          }}
+          className="w-full"
+        >
+          Take Test Again
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto p-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Big Five Personality Assessment</CardTitle>
+          <CardDescription>
+            Question {currentQuestionIndex + 1} of {questions.length}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Progress 
+            value={(currentQuestionIndex / questions.length) * 100} 
+            className="mb-6"
+          />
+          <p className="text-lg mb-6">{questions[currentQuestionIndex].text}</p>
+          <div className="grid grid-cols-5 gap-2">
+            {[1, 2, 3, 4, 5].map((value) => (
+              <Button
+                key={value}
+                onClick={() => handleAnswer(value)}
+                variant="outline"
+                className="p-4"
+              >
+                {value}
+              </Button>
+            ))}
+          </div>
+          <div className="flex justify-between mt-4 text-sm text-gray-500">
+            <span>Strongly Disagree</span>
+            <span>Strongly Agree</span>
+          </div>
+        </CardContent>
+        <CardFooter className="text-sm text-gray-500">
+          Answer honestly for the most accurate results
+        </CardFooter>
+      </Card>
+    </div>
+  );
+};
+
+export default PersonalityTest;
